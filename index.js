@@ -49,7 +49,7 @@ function scrape(id, finished) {
       $('p.commentsParagraph').each((i, e) => {
         var review = e.children[0].data.trim();
         var words = review
-          .replace(/[^A-Za-z\s]/g, '')
+          .replace(/[^A-Za-z\s\']/g, '')
           .toLowerCase()
           .split(/\s+/);
         allWords = allWords.concat(words);

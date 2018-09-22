@@ -9,11 +9,7 @@ var ignore = [];
 fs.readFile('stop-words.txt', 'utf8', (err, text) => {
   if(err) throw err;
   ignore = text.split('\n');
-})
-
-// /search?name={{name}} will search for the professor with the given name
-
-// /reviews/{{id}} will retrieve the reviews for the professor with the given ID
+});
 
 app.get('/search', (request, response) => {
   response.setHeader('Access-Control-Allow-Origin', '*');
