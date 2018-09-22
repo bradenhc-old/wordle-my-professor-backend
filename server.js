@@ -1,13 +1,22 @@
+const fs = require('fs');
 const express = require('express');
 const app = express();
 const backend = require('.');
 const port = 8000;
+
+var ignore = [];
+
+fs.readFile('stop-words.txt', 'utf8', (err, text) => {
+  if(err) throw err;
+  ignore = text.split('\n');
+})
 
 // /search?name={{name}} will search for the professor with the given name
 
 // /reviews/{{id}} will retrieve the reviews for the professor with the given ID
 
 app.get('/search', (request, response) => {
+  response.setHeader('Access-Control-Allow-Origin', '*');
   var query = request.query;
   if (!isValidQuery(query)) {
     return respondBadRequest(response);
@@ -19,9 +28,24 @@ app.get('/search', (request, response) => {
 });
 
 app.get('/reviews/:id', (request, response) => {
+  response.setHeader('Access-Control-Allow-Origin', '*');
   backend.scrape(request.params.id, (err, words) => {
     if (err) return respondBadRequest(response);
-    respondOk(response, words);
+    wordCounts = {};
+    words.forEach(word => {
+      if (ignore.indexOf(word) < 0) {
+        count = wordCounts[word];
+        if (!count) {
+          wordCounts[word] = 0;
+        }
+        wordCounts[word]++;
+      }
+    });
+    final = [];
+    for (const word in wordCounts) {
+      final.push({ word: word, count: wordCounts[word] });
+    }
+    respondOk(response, final);
   });
 });
 
